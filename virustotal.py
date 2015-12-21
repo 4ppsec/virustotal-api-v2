@@ -3,6 +3,7 @@
 #
 # A virustotal.com Public API interactiong script
 # Copyright (C) 2015, Tal Melamed <virustotal AT appsec.it>
+# Contribute @ https://github.com/nu11p0inter/virustotal/
 #
 # VT SCAN EULA
 # ------------
@@ -12,8 +13,7 @@
 # See virustotal Privacy Policy (https://www.virustotal.com/en/about/privacy/) for details.
 #
 
-import sys, os, select, imp, re, urlparse
-import hashlib, urllib, urllib2, json
+import hashlib, urllib, urllib2, json, os
 try:
     import requests
 except:
@@ -26,9 +26,6 @@ class vt:
         # default ouput format --> print to output
         # print, json, html
         self._output = "json"
-        # default mode --> get report
-        # report, scan, rescan, comment
-        self._mode = "report"
         self.errmsg = 'Something went wrong. Please try again later, or contact us.'
         print "Thank you for using virustotal by Tal Melamed <virustotal@appsec.it>\nContribute @ https://github.com/nu11p0inter/virustotal"
 
@@ -49,16 +46,6 @@ class vt:
         
     # change mode of api - scan/rescan, report or comment
 
-    def mode(self, xmode):
-        if xmode == "scan":
-            self._mode = "scan"
-        elif xmode == "rescan":
-            self._mode = "rescan"
-        elif xmode == "comment":
-            self._mode = "comment"
-        else:
-            self._mode = "report"
-
     # change mode of output - json, html or print to output
     def out(self, xformat):
         if xformat == "print":
@@ -67,28 +54,210 @@ class vt:
             self._output = "html"
         else:
             self._output = "json"
-
-
-    # retreive/scan URL
-    def url(self, xurl):
-        return self.get("url", xurl)
-
-        
-    # retreive/rescan file's hash
-    def hash(self, xhash):
-        return self.get("hash", xhash)
             
-    # retreive/rescan file 
-    def file(self, xfile):
-        return self.get("file", xfile)
+    # Sending and scanning files
+    def filescan(self, file):
+        url = self.api_url + "file/scan"
+        files = {'file': open(file, 'rb')}
+        headers = {"apikey": self.api_key}
+        try:
+            response = requests.post( url, files=files, data=headers )
+            xjson = response.json()
+            response_code = xjson ['response_code']
+            verbose_msg = xjson ['verbose_msg']
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()           
 
-    # retreive/rescan domain   
-    def domain(self, xdomain):
-        return self.get("domain", xdomain) 
-    # retreive/rescan ip 
-    def ip(self, xip):
-        return self.get("ip-address", xip)
+    # Sending and scanning URLs
+    def urlscan(self, link):
+        url = self.api_url + "url/scan"
+        parameters = {"url": link, "apikey": self.api_key}
+        data = urllib.urlencode(parameters)
+        req = urllib2.Request(url, data)
+        try:
+            response = urllib2.urlopen(req)
+            xjson = response.read()
+            response_code = json.loads(xjson).get('response_code')
+            verbose_msg = json.loads(xjson).get('verbose_msg')
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+        
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc() 
+        
     
+    # Retrieving file scan reports
+    def getfile(self, file):
+        if os.path.isfile(file):
+            f = open(file, 'rb')
+            file = hashlib.sha256(f.read()).hexdigest()
+            f.close()
+        url = self.api_url + "file/report"
+        parameters = {"resource": file, "apikey": self.api_key}
+        data = urllib.urlencode(parameters)
+        req = urllib2.Request(url, data)
+        try:
+            response = urllib2.urlopen(req)
+            xjson = response.read()
+            response_code = json.loads(xjson).get('response_code')
+            verbose_msg = json.loads(xjson).get('verbose_msg')
+            if response_code == 1:
+                print verbose_msg
+                return report(xjson)
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()       
+              
+    # Retrieving URL scan reports
+    def geturl(self, resource):
+        url = self.api_url + "url/report" 
+        parameters = {"resource": resource, "apikey": self.api_key}
+        data = urllib.urlencode(parameters)
+        req = urllib2.Request(url, data)
+        try:
+            response = urllib2.urlopen(req)
+            xjson = response.read()
+            response_code = json.loads(xjson).get('response_code')
+            verbose_msg = json.loads(xjson).get('verbose_msg')
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+        
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()
+            
+    #Retrieving IP address reports
+    def getip (self, ip):
+        url = self.api_url + "ip-address/report"
+        parameters = {"ip": ip, "apikey": self.api_key}
+        try:
+            response = urllib.urlopen('%s?%s' % (url, urllib.urlencode(parameters))).read()
+            xjson = json.loads(response)
+            response_code = xjson['response_code']
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()  
+        
+    # Retrieving domain reports
+    def getdomain(self, domain):
+        url = self.api_url + "domain/report"
+        parameters = {"domain": domain, "apikey": self.api_key}
+        try:
+            response = urllib.urlopen('%s?%s' % (url, urllib.urlencode(parameters))).read()
+            xjson = json.loads(response)
+            response_code = xjson['response_code']
+            if response_code == 1:
+                return xjson
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()  
+        
+    # Make comments on files and URLs
+    def comment(self, resource, comment):
+        if os.path.isfile(resource):
+            f = open(resource, 'rb')
+            resource = hashlib.sha256(f.read()).hexdigest()
+            f.close()
+        url = self.api_url + "comments/put"
+        parameters = {"resource": resource, "comment": comment, "apikey": self.api_key}
+        data = urllib.urlencode(parameters)
+        req = urllib2.Request(url, data)
+        try:
+            response = urllib2.urlopen(req)
+            xjson = response.read()
+            response_code = json.loads(xjson).get('response_code')
+            verbose_msg = json.loads(xjson).get('verbose_msg')
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()    
+    #Rescanning already submitted files  
+    def rescan(self, resource):
+        if os.path.isfile(resource):
+            f = open(resource, 'rb')
+            resource = hashlib.sha256(f.read()).hexdigest()
+            f.close()
+        url = self.api_url + "file/rescan"
+        parameters = {"resource":  resource, "apikey": self.api_key }
+        data = urllib.urlencode(parameters)
+        req = urllib2.Request(url, data)
+        try:
+            response = urllib2.urlopen(req)
+            xjson = response.read()
+            response_code = json.loads(xjson).get('response_code')
+            verbose_msg = json.loads(xjson).get('verbose_msg')
+            if response_code == 1:
+                print verbose_msg
+                return xjson
+            else:
+                print verbose_msg
+                
+        except urllib2.HTTPError, e:
+            self.handleHTTPErros(e.code)
+        except urllib2.URLError, e:
+            print 'URLError: ' + str(e.reason)
+        except Exception:
+            import traceback
+            print 'generic exception: ' + traceback.format_exc()
 
     # internal - mode REPORT
     def get(self, xtype, xresource):
@@ -155,23 +324,24 @@ class vt:
             print 'generic exception: ' + traceback.format_exc()
             
     # internal - returns results accourding to output format (json, html or output)
-    def results(self, result, xtype, xresource):
+    def report(self, json):
         if self._output == "json":
             return result
 
         elif self._output == "html":
             if xtype == "ip-address" or xtype == "domain":
-                # no url in api for ip/domain
-                return "https://www.virustotal.com/en/" + xtype + "/" + xresource + "/information/"
+                print "https://www.virustotal.com/en/" + xtype + "/" + xresource + "/information/"
+                # todo: get html results for ip/domain
+                return json
             else:
                 url = result.get('permalink')
                 print url
                 html = urllib2.urlopen(url, timeout=3).read()
                 return html.replace('<div class="frame" style="margin:20px 0">', '<a href="https://github.com/nu11p0inter/virustotal"> Exceuted by Tal Melamed [virustotal@appsec.it]</a> <div class="frame" style="margin:20px 0">')
-        else:
+        else: #print
             if xtype == "ip-address" or xtype == "domain":
-                pass
-                #todo: parse result
+                #todo: parse results for ip/domain
+                return json
             else:
                 avlist = []
                 scan_date = result.get('scan_date')
@@ -191,14 +361,6 @@ class vt:
                 else:
                     return 0
 
-
     # set a new api-key
     def setkey(self, key):
         self.api_key = key
-    # get current status    
-    def status(self):
-        print "key: " + self.api_key
-        print "api: " + self.api_url
-        print "mode: " + self._mode
-        print "output: " + self._output
-        
