@@ -1,4 +1,4 @@
-VirusTotal
+VirusTotal Public API
 ==========
 Python scripts to interact with the virustotal.com [Public API](https://www.virustotal.com/en/documentation/public-api/)
 
@@ -8,7 +8,7 @@ python requests module (pip install requests) - this is essential only when uplo
 ## How to use
 ### Get api key
 Register to get your api key from [virustotal](https://www.virustotal.com)
-### update key in file
+### Update key in file
 Take your key from [here](https://www.virustotal.com/en/user/appsec/apikey/) and add it to virustotal.py
 ```
 self.api_key = '<-- YOUR API KEY HERE -->'
@@ -24,7 +24,7 @@ from virustotal import vt
 vt = vt()
 ```
 
-### update api key
+### Update api key
 ```
 vt.setkey('___KEY___')
 ```
@@ -66,6 +66,19 @@ msg = "#Malware @https://github.com/nu11p0inter/virustotal/"
 vt.comment(hash, msg)
 ```
 
+#### Feature - Output format
+For geturl/ getfile - you can get your repsonse as a JSON, HTML or Print
+simpley change the vt.out() to the desired output format and call the api normally. Exmaple:
+```
+vt.out('html')
+vt.getfile('file.ext')
+
+vt.out('print')
+vt.geturl('http://github.com/nu11p0inter/')
+
+vt.out('json')
+...
+```
 
 ## Authors
 Tal Melamed <github@appsec.it>
