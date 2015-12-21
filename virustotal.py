@@ -56,7 +56,7 @@ class vt:
             self._output = "json"
             
     # Sending and scanning files
-    def filescan(self, file):
+    def scanfile(self, file):
         url = self.api_url + "file/scan"
         files = {'file': open(file, 'rb')}
         headers = {"apikey": self.api_key}
@@ -80,7 +80,7 @@ class vt:
             print 'generic exception: ' + traceback.format_exc()           
 
     # Sending and scanning URLs
-    def urlscan(self, link):
+    def scanurl(self, link):
         url = self.api_url + "url/scan"
         parameters = {"url": link, "apikey": self.api_key}
         data = urllib.urlencode(parameters)
