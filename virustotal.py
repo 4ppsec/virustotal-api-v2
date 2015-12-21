@@ -21,7 +21,7 @@ except:
 
 class vt:
     def __init__(self):
-        self.api_key = '84a3beb16d1824c097a0924e10e6ad394938e1573cd87d9481a20b56e658d554' #'< YOUR API KEY HERE >'
+        self.api_key = '<-- YOUR API KEY HERE -->'
         self.api_url = 'https://www.virustotal.com/vtapi/v2/'
         # default ouput format --> print to output
         # print, json, html
