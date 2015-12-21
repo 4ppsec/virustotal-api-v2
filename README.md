@@ -81,5 +81,9 @@ vt.out('json')
 ```
 
 ## Authors
-Tal Melamed <github@appsec.it>
+```
+Tal Melamed 
+<github@appsec.it>
 https://github.com/nu11p0inter/
+```
+
