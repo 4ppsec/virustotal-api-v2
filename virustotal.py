@@ -122,7 +122,7 @@ class vt:
             verbose_msg = json.loads(xjson).get('verbose_msg')
             if response_code == 1:
                 print verbose_msg
-                return report(xjson)
+                return self.report(xjson)
             else:
                 print verbose_msg
                 
@@ -147,7 +147,7 @@ class vt:
             verbose_msg = json.loads(xjson).get('verbose_msg')
             if response_code == 1:
                 print verbose_msg
-                return xjson
+                return self.report(xjson)
             else:
                 print verbose_msg
         
@@ -167,6 +167,7 @@ class vt:
             response = urllib.urlopen('%s?%s' % (url, urllib.urlencode(parameters))).read()
             xjson = json.loads(response)
             response_code = xjson['response_code']
+            verbose_msg = xjson['verbose_msg']
             if response_code == 1:
                 print verbose_msg
                 return xjson
@@ -189,7 +190,9 @@ class vt:
             response = urllib.urlopen('%s?%s' % (url, urllib.urlencode(parameters))).read()
             xjson = json.loads(response)
             response_code = xjson['response_code']
+            verbose_msg = xjson['verbose_msg']
             if response_code == 1:
+                print verbose_msg
                 return xjson
             else:
                 print verbose_msg
@@ -229,7 +232,8 @@ class vt:
             print 'URLError: ' + str(e.reason)
         except Exception:
             import traceback
-            print 'generic exception: ' + traceback.format_exc()    
+            print 'generic exception: ' + traceback.format_exc()
+            
     #Rescanning already submitted files  
     def rescan(self, resource):
         if os.path.isfile(resource):
@@ -259,107 +263,38 @@ class vt:
             import traceback
             print 'generic exception: ' + traceback.format_exc()
 
-    # internal - mode REPORT
-    def get(self, xtype, xresource):
-        resource = "resource"
-        if xtype == "url":
-            api_addr  = self.api_url + xtype + "/" + self._mode
-            resource = "resource"
-            
-        elif xtype == "domain":
-            resource = "domain"
-            api_addr  = self.api_url + xtype + "/" + self._mode
-            
-        elif xtype == "ip-address":
-            api_addr  = self.api_url + xtype + "/" + self._mode
-            resource = "ip"
-            
-        elif xtype == "file":
-            api_addr  = self.api_url + xtype + "/" + self._mode
-            f = open(xresource, 'rb').read()
-            xresource = hashlib.sha256(f).hexdigest()
-            
-        elif xtype == "hash":
-            api_addr  = self.api_url + "file" + "/" + self._mode
-
-        else:
-            return -1
-
-        parameters = {resource: xresource, "apikey": self.api_key }
-        try:
-            response = urllib.urlopen('%s?%s' % (api_addr, urllib.urlencode(parameters))).read()
-            try:
-                xjson = json.loads(response)
-                response_code = xjson.get('response_code')
-            except:
-                data = urllib.urlencode(parameters)
-                req = urllib2.Request(api_addr, data)
-                response = urllib2.urlopen(req)
-                xjson = response.read()
-                print xjson
-                response_code = 0
-            #response_msg = xjson.get('verbose_msg')
-            if response_code == 0:
-                print "No information was found on resource: " + xresource + "\nRun: # vt.mode('scan') to change to 'scan' mode and execute again."
-                return 0
-            # the file is already in queue for scanning
-            elif response_code == -2:
-                print 'The requested file was already sent for scanning.\nPlease try again later for the results.'
-                return -2
-            # results were found for file
-            elif response_code == 1:
-                #print 'Found results for resource: ' + xresource + ':\n'
-                return self.results(xjson, xtype, xresource)
-            # unknown reponse from VT...   
-            else:
-                print self.errmsg +'\nUnexpected response: [response_code: ' + response_code + ']'
-                return -1
-
-        except urllib2.HTTPError, e:
-            self.handleHTTPErros(e.code)
-        except urllib2.URLError, e:
-            print 'URLError: ' + str(e.reason)
-        except Exception:
-            import traceback
-            print 'generic exception: ' + traceback.format_exc()
-            
     # internal - returns results accourding to output format (json, html or output)
-    def report(self, json):
+    # available only for getfile and geturl
+    def report(self, jsonx):
         if self._output == "json":
-            return result
+            return jsonx
 
         elif self._output == "html":
-            if xtype == "ip-address" or xtype == "domain":
-                print "https://www.virustotal.com/en/" + xtype + "/" + xresource + "/information/"
-                # todo: get html results for ip/domain
-                return json
-            else:
-                url = result.get('permalink')
-                print url
-                html = urllib2.urlopen(url, timeout=3).read()
-                return html.replace('<div class="frame" style="margin:20px 0">', '<a href="https://github.com/nu11p0inter/virustotal"> Exceuted by Tal Melamed [virustotal@appsec.it]</a> <div class="frame" style="margin:20px 0">')
+            jsonx = json.loads(jsonx)
+            url = jsonx.get('permalink')
+            print url
+            html = urllib2.urlopen(url, timeout=3).read()
+            return html.replace('<div class="frame" style="margin:20px 0">', '<a href="https://github.com/nu11p0inter/virustotal"> Exceuted by Tal Melamed [virustotal@appsec.it]</a> <div class="frame" style="margin:20px 0">')
+        
         else: #print
-            if xtype == "ip-address" or xtype == "domain":
-                #todo: parse results for ip/domain
-                return json
+            avlist = []
+            jsonx = json.loads(jsonx)
+            scan_date = jsonx.get('scan_date')
+            total = jsonx.get('total')
+            positive = jsonx.get('positives')
+            print 'Scan date: ' + scan_date
+            print 'Detection ratio: ' + str(positive) + "/" + str(total)
+            scans = jsonx.get('scans')
+            for av in scans.iterkeys():
+                res = scans.get(av)
+                if res.get('detected') == True:
+                    avlist.append('+ ' + av + ':  ' + res.get('result'))
+            if positive > 0:
+                for res in avlist:
+                    print res
+                return avlist
             else:
-                avlist = []
-                scan_date = result.get('scan_date')
-                total = result.get('total')
-                positive = result.get('positives')
-                print 'Scan date: ' + scan_date
-                print 'Detection ratio: ' + str(positive) + "/" + str(total)
-                scans = result.get('scans')
-                for av in scans.iterkeys():
-                    res = scans.get(av)
-                    if res.get('detected') == True:
-                        avlist.append('+ ' + av + ':  ' + res.get('result'))
-                if positive > 0:
-                    for res in avlist:
-                        print res
-                    return avlist
-                else:
-                    return 0
+                return 0
 
     # set a new api-key
     def setkey(self, key):
