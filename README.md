@@ -80,10 +80,13 @@ vt.out('json')
 ...
 ```
 
-## Authors
+## Author
 ```
 Tal Melamed 
 <github@appsec.it>
 https://github.com/nu11p0inter/
 ```
 
+### License
+By using the upload/ scan API, you consent to virustotal [Terms of Service](https://www.virustotal.com/en/about/terms-of-service/)
+and allow VirusTotal to share this file with the security community. See virustotal [Privacy Policy](https://www.virustotal.com/en/about/privacy/) for details.
