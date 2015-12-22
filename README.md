@@ -3,7 +3,7 @@ VirusTotal Public API
 Python scripts to interact with the virustotal.com [Public API](https://www.virustotal.com/en/documentation/public-api/)
 
 ## Dependencies
-python requests module (pip install requests) - this is essential only when uploading files for scan
+python requests module (pip install requests) - essential only when uploading files for scan
 
 ## How to use
 ### Get api key
@@ -40,7 +40,7 @@ vt.getfile('ee0fc30726c6dc1ef9ed15809c58d2bb438456ab')
 ```
 vt.geturl('https://github.com/nu11p0inter/')
 vt.getip('98.76.54.32')
-vt.getdoamin('github.com')
+vt.getdomain('github.com')
 ```
 
 * Sending and scanning files
