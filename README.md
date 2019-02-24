@@ -38,18 +38,15 @@ optional arguments:
 ## Usage: python
 ```
 # import
-#-------
-fron vt import VT
+from vt import VT
 vt = VT()
 
 # key management
-#-------
 vt.getkey()
 vt.setkey('___KEY___')
 
 
 # API calls: FILES
-#-------
 vt.getfile('path/to/filename.ext')
 vt.getfile('ee0fc30726c6dc1ef9ed15809c58d2bb438456ab')
 vt.scanfile('path/to/file.ext')
@@ -57,14 +54,12 @@ vt.rescan('file.ext')
 vt.rescan('ee0fc30726c6dc1ef9ed15809c58d2bb438456ab')
 
 # API calls: NET
-#-------
 vt.geturl('https://github.com/nu11p0inter/')
 vt.scanurl('http://github.com/nu11p0inter.com')
 vt.getip('98.76.54.32')
 vt.getdomain('github.com')
 
 # API Call: Comment
-#-------
 hash = open(file, 'rb').read()
 msg = "#Malware @https://github.com/nu11p0inter/virustotal/"
 vt.comment(hash, msg)
@@ -72,7 +67,6 @@ vt.comment('path/to/filename.ext', msg)
 
 
 # Set OUTPUT method:
-#-------
 vt.out('html')
 vt.out('print')
 vt.out('json')
