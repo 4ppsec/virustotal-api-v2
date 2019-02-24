@@ -14,11 +14,11 @@ usage: vt.py [-h] [-k] [-sk SETKEY] [-gf GETFILE] [-gu GETURL]
                    [-o OUTPUT] [-q] [-nb]
 
 optional arguments:
-  -h,  --help             			                   | show this help message and exit
-  -k,  --getkey             	                     | print your VirusTotal API Key
+  -h,  --help                                      | show this help message and exit
+  -k,  --getkey                                    | print your VirusTotal API Key
   -sk, --setkey     [api_key]                      | set VirusTotal API Key
   -gf, --getfile    [options: path/to/file, md5]   | return result of the specified file
-  -gu, --geturl     [url] 	                       | return result for the specified url
+  -gu, --geturl     [url]                          | return result for the specified url
   -gi, --getip      [ip_address]                   | return result for the specified IP address
   -gd, --getdomain  [domain]                       | return result for the specified
   -c,  --comment    [resource] [comment]           | comment on a specified resource (hash)
