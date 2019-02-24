@@ -38,8 +38,9 @@ optional arguments:
 ## python
 
 #### Installation
- `pip install virustotal-api-v2`
- https://pypi.org/project/virustotal-api-v2/
+```pip install virustotal-api-v2```
+
+  https://pypi.org/project/virustotal-api-v2/
 
 #### Usage
 ```
