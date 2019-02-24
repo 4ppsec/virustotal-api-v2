@@ -14,13 +14,13 @@ usage: vt.py [-h] [-k] [-sk SETKEY] [-gf GETFILE] [-gu GETURL]
                    [-o OUTPUT] [-q] [-nb]
 
 optional arguments:
-  -h,  --help             			| show this help message and exit
-  -k,  --getkey             		| print your VirusTotal API Key
+  -h,  --help             			                   | show this help message and exit
+  -k,  --getkey             	                     | print your VirusTotal API Key
   -sk, --setkey     [api_key]                      | set VirusTotal API Key
   -gf, --getfile    [options: path/to/file, md5]   | return result of the specified file
-  -gu, --geturl     [url] 	    | return result for the specified url
-  -gi, --getip      [ip_address] 	| return result for the specified IP address
-  -gd, --getdomain  [domain] 		| return result for the specified
+  -gu, --geturl     [url] 	                       | return result for the specified url
+  -gi, --getip      [ip_address]                   | return result for the specified IP address
+  -gd, --getdomain  [domain]                       | return result for the specified
   -c,  --comment    [resource] [comment]           | comment on a specified resource (hash)
   -sf, --scanfile   [options: path/to/file, md5]   | return result for the specified file
   -su, --scanurl    [url]                          | submit the specified url for a scan
@@ -32,7 +32,7 @@ optional arguments:
   -dl, --download   [options: /path/to/file, hash] | download file [Private API]
   -o,  --output     [options: stdout, html, json]  | set the result output type. default=json
   -q,  --quiet                                     | when set, no prints to stdout  
-  -nb, --nobrowser       | when using `html` mode, will disable automatic open of report
+  -nb, --nobrowser                                 | when using `html` mode, will disable automatic open of report
 ```
 
 ## Usage: python
