@@ -5,7 +5,7 @@ API v2
 Python scripts to interact with the virustotal.com [Public API](https://www.virustotal.com/en/documentation/public-api/)
 
 
-## Usage: Bash
+## Bash
 ```
 usage: vt.py [-h] [-k] [-sk SETKEY] [-gf GETFILE] [-gu GETURL]
                    [-gi GETIP] [-gd GETDOMAIN] [-c COMMENT COMMENT]
@@ -35,7 +35,13 @@ optional arguments:
   -nb, --nobrowser                                 | when using `html` mode, will disable automatic open of report
 ```
 
-## Usage: python
+## python
+
+#### Installation
+ `pip install virustotal-api-v2`
+ https://pypi.org/project/virustotal-api-v2/
+
+#### Usage
 ```
 # import
 from vt import VT
